@@ -4,13 +4,13 @@
 <div class="tags-index-page">
     <h1>所有标签</h1>
     <div class="tag-list">
-        {% for tag, count in tags.items() %}
+        {% for tag, count in tags %}
         <div class="tag-item">
             <h2>
-                <a href="/content/tags/{{ tag.lower().replace(' ', '-') }}.html">{{ tag }}</a>
-                <span class="count">({{ count }})</span>
+                <a href="{{ site.base_url }}/content/tags/{{ tag.lower().replace(' ', '-') }}.html">{{ tag }}</a>
+                <span class="count">({{ count[0] }})</span>
             </h2>
-        </div>
+        </div> 
         {% endfor %}
     </div>
 </div>

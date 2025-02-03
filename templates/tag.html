@@ -1,23 +1,44 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="tag-page">
-    <h1>标签：{{ tag }}</h1>
+<div class="content">
+    <h1>{{ tag }}</h1>
     <p>共 {{ post_count }} 篇相关文章</p>
-    <div class="post-list">
+    <br>
+    <div class="posts">
         {% for post in posts %}
-        <article class="post-item">
-            <h2><a href="{{ site.base_url }}/{{ post.path }}/{{ post.slug }}.html">{{ post.title }}</a></h2>
+        <article class="post">
+            <h2 class="post-title"><a href="{{ post.url }}">{{ post.title }}</a></h2>
             <div class="post-meta">
                 <span class="date">{{ post.date.strftime('%Y-%m-%d') }}</span>
                 <span class="tags">
                     {% for t in post.tags %}
-                    <a href="/content/tags/{{ t.lower().replace(' ', '-') }}.html">{{ t }}</a>
+                    <a href="{{ site.base_url }}/content/tags/{{ t.lower().replace(' ', '-') }}.html">{{ t }}</a>
                     {% endfor %}
                 </span>
             </div>
+            <div class="post-excerpt">
+                {{ post.excerpt | safe }}
+            </div>
         </article>
         {% endfor %}
+    </div>
+
+    <!-- 分页导航 -->
+    <div class="pagination">
+        {% if pagination.has_prev %}
+            {% if pagination.prev_page == 1 %}
+                <a href="{{ site.base_url }}/content/tags/{{ tag.lower().replace(' ', '-') }}.html" class="prev">上一页</a>
+            {% else %}
+                <a href="{{ site.base_url }}/content/tags/{{ tag.lower().replace(' ', '-') }}-{{ pagination.prev_page }}.html" class="prev">上一页</a>
+            {% endif %}
+        {% endif %}
+
+        <span class="current-page">第 {{ pagination.current_page }} 页 / 共 {{ pagination.total_pages }} 页</span>
+
+        {% if pagination.has_next %}
+            <a href="{{ site.base_url }}/content/tags/{{ tag.lower().replace(' ', '-') }}-{{ pagination.next_page }}.html" class="next">下一页</a>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

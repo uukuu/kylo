@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
-<article class="post" id="post-article">
-    <header>
+<article>
+    
+    <div class="content"  id="post-article">
         <h1><center>{{ post.title }}</center></h1>
         <div class="meta">
             <center>
@@ -19,9 +20,6 @@
             </span>
             </center>
         </div>
-    </header>
-    
-    <div class="content">
         {% if post.type == 'md' %}
         <div class="markdown-body">
             {{ post.content|safe }}

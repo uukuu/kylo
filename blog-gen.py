@@ -10,20 +10,20 @@ from bs4 import BeautifulSoup
 
 # 配置
 CONFIG = {
-    'site_name': 'Docly',
-    'author': 'Docly',
+    'site_name': 'uuku',
+    'author': 'uuku',
     'description': 'Personal Blog System',
     'local_url': 'http://127.0.0.1:8080',
-    'github_url': 'https://github.com/xxx.github.io',
+    'public_url': 'https://uukuu.github.io',
     'theme': 'default',
-    'output_dir': './local',
+    'output_dir': '',
     'source_dir': './content',
     'templates_dir': './templates',
     'static_dir': './static',
-    'per_page': 20,
-    'categories': ['算法竞赛', '数学', 'AI', 'Web', 'Latex'],  #文章分类，用于修改顶部导航栏文章分类中内容
+    'per_page': 10,
+    'categories': ['算法竞赛', '数学', 'AI', 'Web', 'Latex'],
     'extensions': ['md', 'pdf', 'html'],
-    'base_url': ''
+    'tag_count': 5,  # 侧边栏标签数量, 显示最多的tag_count个标签
 }
 
 # 初始化Jinja2环境
@@ -40,6 +40,7 @@ class Post:
         self.tags = []  # 添加标签
         self.slug = os.path.splitext(os.path.basename(filepath))[0]  # 添加slug
         self.type = os.path.splitext(filepath)[1][1:]  # 添加文件类型
+        self.url = CONFIG['base_url']+'/'+self.path+'/'+self.slug+'.html'
         self.parse()
     def parse(self):
             """根据文件类型调用相应的解析方法"""
@@ -334,6 +335,7 @@ class BlogGenerator:
         os.makedirs(self.config['output_dir'], exist_ok=True)
         os.makedirs(os.path.join(self.config['output_dir'], 'content/posts'), exist_ok=True)
         os.makedirs(os.path.join(self.config['output_dir'], 'content/pages'), exist_ok=True)
+        os.makedirs(os.path.join(self.config['output_dir'], 'content/index'), exist_ok=True)
         os.makedirs(os.path.join(self.config['output_dir'], 'static'), exist_ok=True)
 
     def load_posts(self):
@@ -343,21 +345,25 @@ class BlogGenerator:
                 if file.split('.')[-1] in self.config['extensions']:
                     post = Post(os.path.join(root, file))
                     self.posts.append(post)
+        self.config['total_posts'] = len(self.posts)
         # 按日期排序
         self.posts.sort(key=lambda x: x.date, reverse=True)
         self._calculate_statistics()
-
 
     def _calculate_statistics(self):
         # 计算分类和标签统计
         for post in self.posts:
             # 统计分类
             for category in post.categories:
-                self.categories[category] = self.categories.get(category, 0) + 1
-            
+                self.categories[category] = [self.categories.get(category, [0,[]])[0] + 1,self.categories.get(category, [0,[]])[1]+[post]]
             # 统计标签
             for tag in post.tags:
-                self.tags[tag] = self.tags.get(tag, 0) + 1
+                self.tags[tag] = [self.tags.get(tag, [0,[]])[0] + 1,self.tags.get(tag, [0,[]])[1]+[post]]
+        # 按标签数量排序
+        self.tags = sorted(self.tags.items(), key=lambda x: x[1][0], reverse=True)
+        # 按分类数量排序
+        self.categories = sorted(self.categories.items(), key=lambda x: x[1][0], reverse=True)
+        # print(self.categories['算法竞赛'])
 
     def generate_site(self):
         # 生成整个站点
@@ -401,20 +407,39 @@ class BlogGenerator:
         with open(os.path.join(self.config['output_dir'], 'base.html'), 'w', encoding='utf-8') as f:
             f.write(output)
 
-    def generate_index(self):
-        """生成首页，同时注入 tags 数据供 index.html 动态生成标签云"""
+    def generate_index(self, posts_per_page=CONFIG['per_page']):
+        """生成首页，支持分页"""
         template = env.get_template("index.html")
-        context = {
-            'site': self.config,
-            'posts': self.posts,
-            'categories': self.categories,
-            'tags': self.tags,  # 注入 tags 数据
-            'now': datetime.datetime.now()
-        }
-        output = template.render(context)
-        output_path = os.path.join(self.config['output_dir'], 'index.html')
-        with open(output_path, 'w', encoding='utf-8') as f:
-            f.write(output)
+        total_posts = len(self.posts)
+        total_pages = (total_posts + posts_per_page - 1) // posts_per_page
+
+        for page in range(1, total_pages + 1):
+            start = (page - 1) * posts_per_page
+            end = start + posts_per_page
+            page_posts = self.posts[start:end]
+
+            context = {
+                'site': self.config,
+                'posts': page_posts,
+                'categories': self.categories,
+                'tags': self.tags,
+                'pagination': {
+                    'current_page': page,
+                    'total_pages': total_pages,
+                    'has_prev': page > 1,
+                    'prev_page': page - 1,
+                    'has_next': page < total_pages,
+                    'next_page': page + 1,
+                    'page_list': range(1, total_pages + 1)
+                },
+                'now': datetime.datetime.now(),
+                'type': 'index'
+            }
+
+            output = template.render(context)
+            output_path = os.path.join(self.config['output_dir'],f'{"" if page == 1 else "content/index"}', f'index{"" if page == 1 else f"-{page}"}.html')
+            with open(output_path, 'w', encoding='utf-8') as f:
+                f.write(output)
 
     def generate_post(self, post):
         # 生成文章页面
@@ -445,41 +470,55 @@ class BlogGenerator:
         os.makedirs(categories_dir, exist_ok=True)
 
         # 生成所有分类页面
-        for category, count in self.categories.items():
-            self._generate_category_page(category, count)
+        self.generate_category_pages()
 
         # 生成分类索引页面
         self._generate_category_index()
 
-    def _generate_category_page(self, category, count):
-        """生成单个分类页面"""
-        # 获取该分类下的文章
-        category_posts = [post for post in self.posts if category in post.categories]
-        
-        # 渲染模板
-        template = env.get_template('category.html')
-        context = {
-            'site': self.config,
-            'category': category,
-            'posts': category_posts,
-            'post_count': count,
-            'categories': self.categories,
-            'tags': self.tags,
-            'now': datetime.datetime.now(),
-            'type': 'category'
-        }
-        output = template.render(context)
-        
-        # 保存文件
-        category_slug = category.lower().replace(' ', '-')
-        output_path = os.path.join(self.config['output_dir'], 'content/categories', f'{category_slug}.html')
-        with open(output_path, 'w', encoding='utf-8') as f:
-            f.write(output)
+    def generate_category_pages(self, posts_per_page=CONFIG['per_page']):
+        """生成分类页面，支持分页"""
+        template = env.get_template("category.html")
+        for category, posts in self.categories:
+            total_posts = posts[0]
+            total_pages = (total_posts + posts_per_page - 1) // posts_per_page
+
+            for page in range(1, total_pages + 1):
+                start = (page - 1) * posts_per_page
+                end = start + posts_per_page
+                page_posts = posts[1][start:end]
+
+                context = {
+                    'site': self.config,
+                    'category': category,
+                    'posts': page_posts,
+                    'post_count': len(posts[1]),
+                    'pagination': {
+                        'current_page': page,
+                        'total_pages': total_pages,
+                        'has_prev': page > 1,
+                        'prev_page': page - 1,
+                        'has_next': page < total_pages,
+                        'next_page': page + 1,
+                    },
+                    'now': datetime.datetime.now()
+                }
+
+                output = template.render(context)
+                output_path = os.path.join(
+                    self.config['output_dir'],
+                    'content',
+                    'categories',
+                    f"{category.lower().replace(' ', '-')}{'' if page == 1 else f'-{page}'}.html"
+                )
+                os.makedirs(os.path.dirname(output_path), exist_ok=True)
+                with open(output_path, 'w', encoding='utf-8') as f:
+                    f.write(output)
 
     def _generate_category_index(self):
         """生成分类索引页面"""
         # 渲染模板
         template = env.get_template('categories.html')
+        # print(self.categories)
         context = {
             'site': self.config,
             'categories': self.categories,
@@ -488,6 +527,7 @@ class BlogGenerator:
             'type': 'categories',
             'tags': self.tags
         }
+        # print(context['categories'])
         output = template.render(context)
         
         # 保存文件
@@ -500,29 +540,49 @@ class BlogGenerator:
         tags_dir = os.path.join(self.config['output_dir'], 'content', 'tags')
         os.makedirs(tags_dir, exist_ok=True)
         # 为每个标签生成单独页面
-        for tag, count in self.tags.items():
-            self._generate_tag_page(tag, count)
+        self.generate_tag_pages()
         # 生成标签索引页面
         self._generate_tag_index()
 
-    def _generate_tag_page(self, tag, count):
-        """生成单个标签页面"""
-        tag_posts = [post for post in self.posts if tag in post.tags]
-        template = env.get_template('tag.html')
-        context = {
-            'site': self.config,
-            'tag': tag,
-            'posts': tag_posts,
-            'post_count': count,
-            'tags': self.tags,  # 同样注入 tags 数据，方便在页面中构建标签云
-            'now': datetime.datetime.now(),
-            'type': 'tag'
-        }
-        output = template.render(context)
-        tag_slug = tag.lower().replace(' ', '-')
-        output_path = os.path.join(self.config['output_dir'], 'content', 'tags', f'{tag_slug}.html')
-        with open(output_path, 'w', encoding='utf-8') as f:
-            f.write(output)
+    def generate_tag_pages(self, posts_per_page=CONFIG['per_page']):
+        """生成标签页面，支持分页"""
+        template = env.get_template("tag.html")
+        for tag, posts in self.tags:
+            total_posts = posts[0]
+            total_pages = (total_posts + posts_per_page - 1) // posts_per_page
+
+            for page in range(1, total_pages + 1):
+                start = (page - 1) * posts_per_page
+                end = start + posts_per_page
+                page_posts = posts[1][start:end]
+
+                context = {
+                    'site': self.config,
+                    'tag': tag,
+                    'posts': page_posts,
+                    'post_count': len(posts[1]),
+                    'pagination': {
+                        'current_page': page,
+                        'total_pages': total_pages,
+                        'has_prev': page > 1,
+                        'prev_page': page - 1,
+                        'has_next': page < total_pages,
+                        'next_page': page + 1,
+                    },
+                    'now': datetime.datetime.now(),
+                    'tags': self.tags
+                }
+
+                output = template.render(context)
+                output_path = os.path.join(
+                    self.config['output_dir'],
+                    'content',
+                    'tags',
+                    f"{tag.lower().replace(' ', '-')}{'' if page == 1 else f'-{page}'}.html"
+                )
+                os.makedirs(os.path.dirname(output_path), exist_ok=True)
+                with open(output_path, 'w', encoding='utf-8') as f:
+                    f.write(output)
 
     def _generate_tag_index(self):
         """生成所有标签的索引页面"""
@@ -535,7 +595,7 @@ class BlogGenerator:
             'type': 'tags'
         }
         output = template.render(context)
-        output_path = os.path.join(self.config['output_dir'], 'content', 'tags', 'index.html')
+        output_path = os.path.join(self.config['output_dir'], 'content', 'pages', 'tags.html')
         with open(output_path, 'w', encoding='utf-8') as f:
             f.write(output)
 
@@ -545,9 +605,10 @@ class BlogGenerator:
 
 if __name__ == '__main__':
     CONFIG['base_url']=CONFIG['local_url']
+    CONFIG['output_dir']='./local'
     generator = BlogGenerator(CONFIG)
     generator.generate_site()
-    CONFIG['base_url']=CONFIG['github_url']
+    CONFIG['base_url']=CONFIG['public_url']
     CONFIG['output_dir']='./public'
     generator = BlogGenerator(CONFIG)
     generator.generate_site()

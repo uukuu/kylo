@@ -5,11 +5,11 @@
     <h1>所有分类</h1>
     
     <div class="category-list">
-        {% for category, count in categories.items() %}
+        {% for category, count in categories %}
         <div class="category-item">
             <h2>
-                <a href="/content/categories/{{ category.lower() }}.html">
-                    {{ category }} ({{ count }})
+                <a href="{{ site.base_url }}/content/categories/{{ category.lower() }}.html">
+                    {{ category }} ({{ count[0] }})
                 </a>
             </h2>
         </div>

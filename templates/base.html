@@ -67,15 +67,18 @@
                     <h3>{{ site.author }}</h3>
                     <p>学又学不会 躺又躺不平</p>
                     <div class="social-links">
-                        <a href="#" class="github"><i class="icon-github"></i></a>
-                        <a href="#" class="email"><i class="icon-email"></i></a>
-                        
-            <div class="theme-toggle">
-                <button id="theme-toggle">
-                  <span class="light-icon">🌞</span>
-                  <span class="dark-icon">🌙</span>
-                </button>
-              </div>
+                        <!-- <a href="#" class="github"><i class="icon-github"></i></a>
+                        <a href="#" class="email"><i class="icon-email"></i></a> -->
+                        <div>
+                            <div>{{ site.total_posts }}</div>
+                            <div>文章</div>
+                        </div>
+                        <div class="theme-toggle">
+                            <button id="theme-toggle">
+                            <span class="light-icon">🌞</span>
+                            <span class="dark-icon">🌙</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -101,32 +104,34 @@
                     <li><a href="{{ site.base_url }}/categories/Web/">Web</a></li>
                 </ul>
             </div> -->
-
-            {% if type == 'post' %}
-                {{ post.toc }}
-            {% endif %}
-            <!-- 动态标签云 -->
-            {% if tags %}
-            <div class="widget tag-cloud">
-                <h3><i class="icon-tags"></i> 标签云</h3>
-                <div class="tags">
-                    {% for tag, count in tags.items() %}
-                        {# 根据标签数量设置不同的样式等级 #}
-                        {% if count < 2 %}
-                            {% set tag_class = "tag-1" %}
-                        {% elif count < 5 %}
-                            {% set tag_class = "tag-2" %}
-                        {% elif count < 10 %}
-                            {% set tag_class = "tag-3" %}
-                        {% else %}
-                            {% set tag_class = "tag-4" %}
-                        {% endif %}
-                        <a href="/content/tags/{{ tag.lower().replace(' ', '-') }}.html" class="{{ tag_class }}">{{ tag }}</a>
-                    {% endfor %}
+            <div class="aside-sticky">
+                {% if type == 'post' %}
+                    {{ post.toc }}
+                {% endif %}
+                <!-- 动态标签云 -->
+                {% if tags %}
+                <div class="widget tag-cloud">
+                    <h3><i class="icon-tags"></i> <a href="{{ site.base_url }}/content/pages/tags.html">标签云</a></h3>
+                    <div class="tags">
+                        {% for tag, count in tags[:site.tag_count] %}
+                            {# 根据标签数量设置不同的样式等级 #}
+                            {% if count[0] < 2 %}
+                                {% set tag_class = "tag-1" %}
+                            {% elif count[0] < 5 %}
+                                {% set tag_class = "tag-2" %}
+                            {% elif count[0] < 10 %}
+                                {% set tag_class = "tag-3" %}
+                            {% else %}
+                                {% set tag_class = "tag-4" %}
+                            {% endif %}
+                            <a href="{{ site.base_url }}/content/tags/{{ tag.lower().replace(' ', '-') }}.html" class="{{ tag_class }}">
+                                {{ tag }} ({{ count[0] }})</a>
+                        {% endfor %}
+                    </div>
                 </div>
-            </div>
-            {% endif %}
+                {% endif %}
 
+            </div>
         </aside>
         
         {% block content %}{% endblock %}
