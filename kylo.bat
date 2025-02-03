@@ -4,7 +4,7 @@ setlocal enabledelayedexpansion
 
 
 :: 配置基础参数
-set BLOG_DIR=%~dp0
+set BLOG_DIR=%cd%\
 set PYTHON=python
 set GIT=git
 set HTTP_SERVER=http-server
@@ -81,9 +81,8 @@ if %SERVER% equ 1 (
 
     :: 启动服务器
     pushd "%BLOG_DIR%local"
-    start "" %HTTP_SERVER% -p 8080 -o
+    %HTTP_SERVER% -p 8080 -o
     popd
-    echo local server is running: http://localhost:8080
 )
 
 :: 完成提示
