@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="tags-index-page">
+    <h1>所有标签</h1>
+    <div class="tag-list">
+        {% for tag, count in tags.items() %}
+        <div class="tag-item">
+            <h2>
+                <a href="/content/tags/{{ tag.lower().replace(' ', '-') }}.html">{{ tag }}</a>
+                <span class="count">({{ count }})</span>
+            </h2>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

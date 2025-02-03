@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="content">
+    <div class="posts">
+        {% for post in posts %}
+        <article class="index-post">
+            <h2><a href="{{ site.base_url }}/{{ post.path }}/{{ post.slug }}.html">{{ post.title }}</a></h2>
+            <div class="meta">
+                <span class="date">{{ post.date.strftime('%Y-%m-%d') }}</span>
+                <span class="categories">
+                    {% for category in post.categories %}
+                    <a href="{{ site.base_url }}/categories/{{ category }}.html">{{ category }}</a>
+                    {% endfor %}
+                </span>
+            </div>
+            <div class="excerpt">
+                {{ post.excerpt|safe }}
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+    
+    {% if pagination %}
+    <div class="pagination">
+        {% if pagination.prev %}
+        <a href="{{ site.base_url }}/page/{{ pagination.prev }}.html">上一页</a>
+        {% endif %}
+        
+        {% for page in pagination.pages %}
+        <a href="{{ site.base_url }}/page/{{ page }}.html" {% if page == pagination.current %}class="active"{% endif %}>{{ page }}</a>
+        {% endfor %}
+        
+        {% if pagination.next %}
+        <a href="{{ site.base_url }}/page/{{ pagination.next }}.html">下一页</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

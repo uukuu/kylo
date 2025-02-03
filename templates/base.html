@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ site.site_name }} - {{ title }}</title>
+    <meta name="description" content="{{ site.description }}">
+    <meta name="keywords" content="{{ site.keywords|join(',') }}">
+    <meta name="author" content="{{ site.author }}">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="{{ site.base_url }}/static/css/base.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <link rel="stylesheet" href="{{ site.base_url }}/static/css/highlight/styles/monokai-sublime.min.css">
+    
+    <!-- Scripts -->
+    <script src="{{ site.base_url }}/static/js/base.js"></script>
+    <script src="{{ site.base_url }}/static/js/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</head>
+<body>
+    <img src="{{ site.base_url }}/static/img/背景3.jpg" id="background-image"/>
+    <main id="mainuuku">
+        {% block nav %}
+        <nav>
+            <ul id="starlist">
+                <li class="logo">
+                    <a href="{{ site.base_url }}/index.html">
+                        <img src="{{ site.base_url }}/static/img/logo_uuku.png" alt="logo" height="50"/>
+                    </a>
+                </li>
+                <li><a href="{{ site.base_url }}/index.html">首页</a></li>
+                <li><a href="{{ site.base_url }}/content/pages/person.html">个人简介</a></li>
+                <li class="menu"><a href="">文章分类</a>
+                    <ul class="sub">
+                        {% for category in site.categories %}
+                        <li><a href="{{ site.base_url }}/content/categories/{{ category }}.html">{{ category }}</a></li>
+                        {% endfor %}
+                        <li><a href="{{ site.base_url }}/content/pages/categories.html">所有分类</a></li>
+                    </ul>
+                    <span></span>
+                </li>
+                <li><a href="{{ site.base_url }}/content/pages/jiaocai.html">教材</a></li>
+                <li><a href="">生活</a></li>
+                <li><a href="">友链</a></li>
+                <li><a href="">留言板</a></li>
+            </ul>
+            <h2 id="mnavh"><span class="navicon"></span></h2>
+            <div class="is-search"> <i></i> </div>
+        </nav>
+        {% endblock %}
+        <aside id="sidebar">
+            <!-- 公告栏 -->
+            <div class="widget notice">
+                <h3><i class="icon-bullhorn"></i> 公告栏</h3>
+                <div class="notice-content">
+                    <p>学业繁忙，随缘打理</p>
+                </div>
+            </div>
+
+            <!-- 个人简介 -->
+            <div class="widget profile">
+                <div class="avatar">
+                    <img src="{{ site.base_url }}/static/img/avatar.jpg" alt="头像">
+                </div>
+                <div class = "info">
+                    <h3>{{ site.author }}</h3>
+                    <p>学又学不会 躺又躺不平</p>
+                    <div class="social-links">
+                        <a href="#" class="github"><i class="icon-github"></i></a>
+                        <a href="#" class="email"><i class="icon-email"></i></a>
+                        
+            <div class="theme-toggle">
+                <button id="theme-toggle">
+                  <span class="light-icon">🌞</span>
+                  <span class="dark-icon">🌙</span>
+                </button>
+              </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 导航菜单 -->
+            <!-- <div class="widget navigation">
+                <ul>
+                    <li><a href="{{ site.base_url }}/"><i class="icon-home"></i> 首页</a></li>
+                    <li><a href="{{ site.base_url }}/posts/"><i class="icon-article"></i> 文章</a></li>
+                    <li><a href="{{ site.base_url }}/about/"><i class="icon-user"></i> 个人简介</a></li>
+                    <li><a href="{{ site.base_url }}/links/"><i class="icon-link"></i> 友链</a></li>
+                    <li><a href="{{ site.base_url }}/guestbook/"><i class="icon-comment"></i> 留言板</a></li>
+                </ul>
+            </div> -->
+
+            <!-- 文章分类
+            <div class="widget categories">
+                <h3><i class="icon-folder"></i> 文章分类</h3>
+                <ul>
+                    <li><a href="{{ site.base_url }}/categories/算法竞赛/">算法竞赛</a></li>
+                    <li><a href="{{ site.base_url }}/categories/数学/">数学</a></li>
+                    <li><a href="{{ site.base_url }}/categories/LaTex/">LaTex</a></li>
+                    <li><a href="{{ site.base_url }}/categories/Web/">Web</a></li>
+                </ul>
+            </div> -->
+
+            {% if type == 'post' %}
+                {{ post.toc }}
+            {% endif %}
+            <!-- 动态标签云 -->
+            {% if tags %}
+            <div class="widget tag-cloud">
+                <h3><i class="icon-tags"></i> 标签云</h3>
+                <div class="tags">
+                    {% for tag, count in tags.items() %}
+                        {# 根据标签数量设置不同的样式等级 #}
+                        {% if count < 2 %}
+                            {% set tag_class = "tag-1" %}
+                        {% elif count < 5 %}
+                            {% set tag_class = "tag-2" %}
+                        {% elif count < 10 %}
+                            {% set tag_class = "tag-3" %}
+                        {% else %}
+                            {% set tag_class = "tag-4" %}
+                        {% endif %}
+                        <a href="/content/tags/{{ tag.lower().replace(' ', '-') }}.html" class="{{ tag_class }}">{{ tag }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+        </aside>
+        
+        {% block content %}{% endblock %}
+
+    </main>
+    
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="/about/">关于</a>
+                <a href="/links/">友链</a>
+                <a href="/guestbook/">留言</a>
+                <a href="/privacy/">隐私</a>
+            </div>
+            
+            <div class="social-links">
+                <a href="#" class="github"><i class="icon-github"></i></a>
+                <a href="#" class="email"><i class="icon-email"></i></a>
+                <a href="#" class="rss"><i class="icon-rss"></i></a>
+            </div>
+            
+            
+            <div class="copyright">
+                &copy; {{ now.year }} {{ site.author }}. All rights reserved.
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

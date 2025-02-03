@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="tag-page">
+    <h1>标签：{{ tag }}</h1>
+    <p>共 {{ post_count }} 篇相关文章</p>
+    <div class="post-list">
+        {% for post in posts %}
+        <article class="post-item">
+            <h2><a href="{{ site.base_url }}/{{ post.path }}/{{ post.slug }}.html">{{ post.title }}</a></h2>
+            <div class="post-meta">
+                <span class="date">{{ post.date.strftime('%Y-%m-%d') }}</span>
+                <span class="tags">
+                    {% for t in post.tags %}
+                    <a href="/content/tags/{{ t.lower().replace(' ', '-') }}.html">{{ t }}</a>
+                    {% endfor %}
+                </span>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

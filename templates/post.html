@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block content %}
+<article class="post" id="post-article">
+    <header>
+        <h1><center>{{ post.title }}</center></h1>
+        <div class="meta">
+            <center>
+            <span class="date">{{ post.date.strftime('%Y-%m-%d') }}</span>
+            <span class="categories">
+                {% for category in post.categories %}
+                <a href="{{ site.base_url }}/categories/{{ category }}.html">{{ category }}</a>
+                {% endfor %}
+            </span>
+            <span class="tags">
+                {% for tag in post.tags %}
+                <a href="{{ site.base_url }}/tags/{{ tag }}.html">{{ tag }}</a>
+                {% endfor %}
+            </span>
+            </center>
+        </div>
+    </header>
+    
+    <div class="content">
+        {% if post.type == 'md' %}
+        <div class="markdown-body">
+            {{ post.content|safe }}
+        </div>
+        {% else %}
+        <div class="pdf-viewer">
+            <iframe src="{{ post.content }}" width="100%" height="1000px"></iframe>
+        </div>
+        {% endif %}
+        <!-- 文章导航 -->
+        <div class="post-navigation">
+            {% if post.previous %}
+            <a href="{{ site.base_url }}/posts/{{ post.previous.slug }}.html" class="prev-post">
+                &larr; {{ post.previous.title }}
+            </a>
+            {% endif %}
+            
+            {% if post.next %}
+            <a href="{{ site.base_url }}/posts/{{ post.next.slug }}.html" class="next-post">
+                {{ post.next.title }} &rarr;
+            </a>
+            {% endif %}
+        </div>
+        
+        <!-- 评论区域 -->
+        <div id="comments" class="comments-area">
+            <h3>评论</h3>
+            <!-- 这里可以添加评论系统 -->
+        </div>
+    </div>
+</article>
+
+
+<head>
+    <!-- MathJax 配置 -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+                packages: {'[+]': ['ams']}
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            },
+            loader: {
+                load: ['[tex]/ams']
+            }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+    
+    <!-- 代码高亮样式 -->
+    <link rel="stylesheet" href="{{ site.base_url }}/static/css/highlight/styles/monokai-sublime.min.css">
+    
+    <!-- 代码高亮脚本 -->
+    <script src="{{ site.base_url }}/static/css/highlight/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</head>
+{% endblock %}
