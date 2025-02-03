@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>uuku - </title>
+    <meta name="description" content="Personal Blog System">
+    <meta name="keywords" content="">
+    <meta name="author" content="uuku">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://uukuu.github.io/static/css/base.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <link rel="stylesheet" href="https://uukuu.github.io/static/css/highlight/styles/monokai-sublime.min.css">
+    
+    <!-- Scripts -->
+    <script src="https://uukuu.github.io/static/js/base.js"></script>
+    <script src="https://uukuu.github.io/static/js/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+</head>
+<body>
+    <img src="https://uukuu.github.io/static/img/背景3.jpg" id="background-image"/>
+    <main id="mainuuku">
+        
+        <nav>
+            <ul id="starlist">
+                <li class="logo">
+                    <a href="https://uukuu.github.io/index.html">
+                        <img src="https://uukuu.github.io/static/img/logo_uuku.png" alt="logo" height="50"/>
+                    </a>
+                </li>
+                <li><a href="https://uukuu.github.io/index.html">首页</a></li>
+                <li><a href="https://uukuu.github.io/content/pages/person.html">个人简介</a></li>
+                <li class="menu"><a href="">文章分类</a>
+                    <ul class="sub">
+                        
+                        <li><a href="https://uukuu.github.io/content/categories/算法竞赛.html">算法竞赛</a></li>
+                        
+                        <li><a href="https://uukuu.github.io/content/categories/数学.html">数学</a></li>
+                        
+                        <li><a href="https://uukuu.github.io/content/categories/AI.html">AI</a></li>
+                        
+                        <li><a href="https://uukuu.github.io/content/categories/Web.html">Web</a></li>
+                        
+                        <li><a href="https://uukuu.github.io/content/categories/Latex.html">Latex</a></li>
+                        
+                        <li><a href="https://uukuu.github.io/content/pages/categories.html">所有分类</a></li>
+                    </ul>
+                    <span></span>
+                </li>
+                <li><a href="https://uukuu.github.io/content/pages/jiaocai.html">教材</a></li>
+                <li><a href="">生活</a></li>
+                <li><a href="">友链</a></li>
+                <li><a href="">留言板</a></li>
+            </ul>
+            <h2 id="mnavh"><span class="navicon"></span></h2>
+            <div class="is-search"> <i></i> </div>
+        </nav>
+        
+        <aside id="sidebar">
+            <!-- 公告栏 -->
+            <div class="widget notice">
+                <h3><i class="icon-bullhorn"></i> 公告栏</h3>
+                <div class="notice-content">
+                    <p>学业繁忙，随缘打理</p>
+                </div>
+            </div>
+
+            <!-- 个人简介 -->
+            <div class="widget profile">
+                <div class="avatar">
+                    <img src="https://uukuu.github.io/static/img/avatar.jpg" alt="头像">
+                </div>
+                <div class = "info">
+                    <h3>uuku</h3>
+                    <p>学又学不会 躺又躺不平</p>
+                    <div class="social-links">
+                        <!-- <a href="#" class="github"><i class="icon-github"></i></a>
+                        <a href="#" class="email"><i class="icon-email"></i></a> -->
+                        <div>
+                            <div>1</div>
+                            <div>文章</div>
+                        </div>
+                        <div class="theme-toggle">
+                            <button id="theme-toggle">
+                            <span class="light-icon">🌞</span>
+                            <span class="dark-icon">🌙</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 导航菜单 -->
+            <!-- <div class="widget navigation">
+                <ul>
+                    <li><a href="https://uukuu.github.io/"><i class="icon-home"></i> 首页</a></li>
+                    <li><a href="https://uukuu.github.io/posts/"><i class="icon-article"></i> 文章</a></li>
+                    <li><a href="https://uukuu.github.io/about/"><i class="icon-user"></i> 个人简介</a></li>
+                    <li><a href="https://uukuu.github.io/links/"><i class="icon-link"></i> 友链</a></li>
+                    <li><a href="https://uukuu.github.io/guestbook/"><i class="icon-comment"></i> 留言板</a></li>
+                </ul>
+            </div> -->
+
+            <!-- 文章分类
+            <div class="widget categories">
+                <h3><i class="icon-folder"></i> 文章分类</h3>
+                <ul>
+                    <li><a href="https://uukuu.github.io/categories/算法竞赛/">算法竞赛</a></li>
+                    <li><a href="https://uukuu.github.io/categories/数学/">数学</a></li>
+                    <li><a href="https://uukuu.github.io/categories/LaTex/">LaTex</a></li>
+                    <li><a href="https://uukuu.github.io/categories/Web/">Web</a></li>
+                </ul>
+            </div> -->
+            <div class="aside-sticky">
+                
+                <!-- 动态标签云 -->
+                
+                <div class="widget tag-cloud">
+                    <h3><i class="icon-tags"></i> <a href="https://uukuu.github.io/content/pages/tags.html">标签云</a></h3>
+                    <div class="tags">
+                        
+                            
+                            
+                                
+                            
+                            <a href="https://uukuu.github.io/content/tags/ai.html" class="tag-1">
+                                AI (1)</a>
+                        
+                            
+                            
+                                
+                            
+                            <a href="https://uukuu.github.io/content/tags/机器学习.html" class="tag-1">
+                                机器学习 (1)</a>
+                        
+                            
+                            
+                                
+                            
+                            <a href="https://uukuu.github.io/content/tags/pytorch.html" class="tag-1">
+                                pytorch (1)</a>
+                        
+                    </div>
+                </div>
+                
+
+            </div>
+        </aside>
+        
+        
+<div class="content">
+    <h1>机器学习</h1>
+    <p>共 1 篇相关文章</p>
+    <br>
+    <div class="posts">
+        
+        <article class="post">
+            <h2 class="post-title"><a href="https://uukuu.github.io/./content\posts\AI\pytorch/1.html">pytorch-1</a></h2>
+            <div class="post-meta">
+                <span class="date">2025-01-20</span>
+                <span class="tags">
+                    
+                    <a href="https://uukuu.github.io/content/tags/ai.html">AI</a>
+                    
+                    <a href="https://uukuu.github.io/content/tags/机器学习.html">机器学习</a>
+                    
+                    <a href="https://uukuu.github.io/content/tags/pytorch.html">pytorch</a>
+                    
+                </span>
+            </div>
+            <div class="post-excerpt">
+                
+            </div>
+        </article>
+        
+    </div>
+
+    <!-- 分页导航 -->
+    <div class="pagination">
+        
+
+        <span class="current-page">第 1 页 / 共 1 页</span>
+
+        
+    </div>
+</div>
+
+
+    </main>
+    
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="/about/">关于</a>
+                <a href="/links/">友链</a>
+                <a href="/guestbook/">留言</a>
+                <a href="/privacy/">隐私</a>
+            </div>
+            
+            <div class="social-links">
+                <a href="#" class="github"><i class="icon-github"></i></a>
+                <a href="#" class="email"><i class="icon-email"></i></a>
+                <a href="#" class="rss"><i class="icon-rss"></i></a>
+            </div>
+            
+            
+            <div class="copyright">
+                &copy; 2025 uuku. All rights reserved.
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
