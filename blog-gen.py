@@ -7,11 +7,13 @@ from jinja2 import Environment, FileSystemLoader
 from PyPDF2 import PdfReader
 from markdown.extensions.toc import TocExtension
 from bs4 import BeautifulSoup
+import re
 
 # 配置
 CONFIG = {
-    'site_name': 'uuku',
+    'site_name': 'uuku\'s blog',
     'author': 'uuku',
+    'keywords': ['算法竞赛', '数学', 'AI', '学习笔记', 'Latex'],
     'description': 'Personal Blog System',
     'local_url': 'http://127.0.0.1:8080',
     'public_url': 'https://uukuu.github.io',
@@ -21,7 +23,7 @@ CONFIG = {
     'templates_dir': './templates',
     'static_dir': './static',
     'per_page': 10,
-    'categories': ['算法竞赛', '数学', 'AI', 'Web', 'Latex'],
+    'categories': ['算法竞赛', '数学', 'AI', '学习笔记', 'Latex'],
     'extensions': ['md', 'pdf', 'html'],
     'tag_count': 5,  # 侧边栏标签数量, 显示最多的tag_count个标签
 }
@@ -41,6 +43,7 @@ class Post:
         self.slug = os.path.splitext(os.path.basename(filepath))[0]  # 添加slug
         self.type = os.path.splitext(filepath)[1][1:]  # 添加文件类型
         self.url = CONFIG['base_url']+'/'+self.path+'/'+self.slug+'.html'
+        self.word_count = 0  # 添加字数统计
         self.parse()
     def parse(self):
             """根据文件类型调用相应的解析方法"""
@@ -52,6 +55,32 @@ class Post:
                 self.parse_html()
             else:
                 raise ValueError(f"Unsupported file type: {self.type}")
+
+            # 统计字数
+            self.category_count = len(self.categories)
+            self.tag_count = len(self.tags)
+            self.word_count = self._count_words()
+
+
+
+    def _count_words(self):
+        """统计文章字数"""
+        if self.type == 'md':
+            # 去除 Markdown 语法符号
+            text = re.sub(r'[#*\-`~\[\]()>]', '', self.content)
+        elif self.type == 'pdf':
+            # PDF 内容已经是纯文本
+            text = self.content
+        elif self.type == 'html':
+            # 去除 HTML 标签
+            text = re.sub(r'<[^>]+>', '', self.content)
+        else:
+            text = self.content
+
+        # 统计中文字数和英文单词数
+        chinese_chars = len(re.findall(r'[\u4e00-\u9fa5]', text))
+        english_words = len(re.findall(r'\b\w+\b', text))
+        return chinese_chars + english_words
 
     def parse_markdown(self):
         with open(self.filepath, 'r', encoding='utf-8') as f:
@@ -106,14 +135,17 @@ class Post:
         # 生成目录HTML
         toc_html = '<div class="toc-container">\n'
         toc_html += '<h3>目录</h3>\n<ul class="toc-list">\n'
-        
+        min_level = 10
         for header in headers:
+            min_level = min(int(header.name[1]),min_level)
+        for header in headers:
+
             # 为每个标题添加id
             if not header.get('id'):
                 header['id'] = header.text.strip().replace(' ', '-').lower()
             
             # 根据标题级别设置缩进
-            level = int(header.name[1]) - 2
+            level = int(header.name[1]) - min_level
             toc_html += f'<li class="toc-item toc-level-{level}">'
             toc_html += f'<a href="#{header["id"]}">{header.text}</a></li>\n'
         
@@ -360,10 +392,13 @@ class BlogGenerator:
             for tag in post.tags:
                 self.tags[tag] = [self.tags.get(tag, [0,[]])[0] + 1,self.tags.get(tag, [0,[]])[1]+[post]]
         # 按标签数量排序
+        self.config['total_tags'] = len(self.tags)
         self.tags = sorted(self.tags.items(), key=lambda x: x[1][0], reverse=True)
         # 按分类数量排序
+        self.config['total_categories'] = len(self.categories)
         self.categories = sorted(self.categories.items(), key=lambda x: x[1][0], reverse=True)
         # print(self.categories['算法竞赛'])
+
 
     def generate_site(self):
         # 生成整个站点
@@ -373,7 +408,9 @@ class BlogGenerator:
         self.generate_posts()
         self.generate_categories()
         self.generate_tags()
+        self.generate_guestbook()
         self.generate_rss()
+
 
     def copy_static_files(self):
         # 复制静态文件
@@ -500,7 +537,8 @@ class BlogGenerator:
                         'has_next': page < total_pages,
                         'next_page': page + 1,
                     },
-                    'now': datetime.datetime.now()
+                    'now': datetime.datetime.now(),
+                    'tags': self.tags,
                 }
 
                 output = template.render(context)
@@ -596,6 +634,21 @@ class BlogGenerator:
         }
         output = template.render(context)
         output_path = os.path.join(self.config['output_dir'], 'content', 'pages', 'tags.html')
+        with open(output_path, 'w', encoding='utf-8') as f:
+            f.write(output)
+
+
+    def generate_guestbook(self):
+        # 生成留言板页面
+        template = env.get_template('guestbook.html')
+        context = {
+            'site': self.config,
+            'posts': self.posts,
+            'now': datetime.datetime.now(),
+            'type': 'guestbook'
+        }
+        output = template.render(context)
+        output_path = os.path.join(self.config['output_dir'], 'content', 'pages', 'guestbook.html')
         with open(output_path, 'w', encoding='utf-8') as f:
             f.write(output)
 

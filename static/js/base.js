@@ -57,14 +57,12 @@ function aside_left_menu2() {
 
 window.onload = function () {
     var h1 = document.getElementById("post-article").clientHeight;
+    var h3 = document.getElementsByClassName("content")[0].clientHeight;
     var h2 = document.getElementById("sidebar").clientHeight;
-    if (h1 > h2) {
-        document.getElementById("mainuuku").style.height = h1 + "px";
-        document.getElementById("sidebar").style.height = h1 + "px";
-    }
-    else {
-        document.getElementById("mainuuku").style.height = h2 + "px";
-    }
+    var mx = Math.max(h1, h2, h3);
+    document.getElementById("mainuuku").style.height = mx + "px";
+    document.getElementById("sidebar").style.height = mx + "px";
+
 }
 
 // 确保在DOM加载完成后执行
@@ -96,10 +94,19 @@ document.addEventListener('DOMContentLoaded', function () {
             arrow.innerHTML = '▸';
             item.insertBefore(arrow, item.firstChild);
         }
-        if (parseInt(item.classList[1].split('-')[2]) > 0) {
+        var preItem = item.previousElementSibling;
+        var min_level = parseInt(item.classList[1].split('-')[2]);
+        while (preItem) {
+            if (parseInt(preItem.classList[1].split('-')[2]) < min_level) {
+                min_level = parseInt(preItem.classList[1].split('-')[2]);
+            }
+            preItem = preItem.previousElementSibling;
+        }
+        if (parseInt(item.classList[1].split('-')[2]) > min_level) {
             item.style.display = 'none';
         }
         // 添加点击事件
+
         item.addEventListener('click', function (e) {
             // 防止点击链接时触发折叠
             if (e.target.tagName === 'A') return;
@@ -176,25 +183,36 @@ function getTheme() {
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
+function sendMessage(message) {
+    const iframe = document.querySelector("iframe.giscus-frame");
+    if (!iframe || !iframe.contentWindow) return;
+    iframe.contentWindow.postMessage({ giscus: message }, "https://giscus.app");
+  }
+
 // 设置主题
 function setTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
+    sendMessage({
+        setConfig: { theme: theme == "dark" ? "dark_dimmed" : "light" },
+    });
 }
-
 // 初始化主题
+
 function initTheme() {
-    const currentTheme = getTheme();
-    setTheme(currentTheme);
+    // const currentTheme = getTheme();
+    setTheme('dark');
 
     // 监听系统主题变化
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
         if (!localStorage.getItem('theme')) {
             setTheme(e.matches ? 'dark' : 'light');
         }
+
     });
 }
 
 
 // 在DOM加载完成后初始化主题
 document.addEventListener('DOMContentLoaded', initTheme);
+

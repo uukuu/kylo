@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>留言板</title>
+    <link rel="stylesheet" href="{{ site.base_url }}/static/css/base.css">
+</head>
+{% extends "base.html" %}
+
+{% block content %}
+<div class="content">
+    <h1>留言板</h1>
+    <p>如果对该站点有什么建议请在下方提出！</p>
+    <!-- 评论区域 -->
+    <div id="comments" class="comments-area giscus">
+        <!-- 这里可以添加评论系统 -->
+
+    </div>
+</div>
+{% endblock %}

@@ -7,19 +7,53 @@
         <h1><center>{{ post.title }}</center></h1>
         <div class="meta">
             <center>
-            <span class="date">{{ post.date.strftime('%Y-%m-%d') }}</span>
+            <span class="date">
+                📅Date: {{ post.date.strftime('%Y-%m-%d') }}
+            </span>
+            {% if post.category_count > 0 %}
             <span class="categories">
+                {% if post.category_count > 1 %}
+                📚Categories:
+                {% else %}
+                📚Category:
+                {% endif %}
                 {% for category in post.categories %}
-                <a href="{{ site.base_url }}/categories/{{ category }}.html">{{ category }}</a>
+                <a href="{{ site.base_url }}/content/categories/{{ category }}.html">{{ category }}</a>
                 {% endfor %}
             </span>
+            {% endif %}
+
+            {% if post.tag_count > 0 %}
             <span class="tags">
+                {% if post.tag_count > 1 %}
+                📂Tags:
+                {% else %}
+                📂Tag:
+                {% endif %}
                 {% for tag in post.tags %}
-                <a href="{{ site.base_url }}/tags/{{ tag }}.html">{{ tag }}</a>
+
+                <a href="{{ site.base_url }}/content/tags/{{ tag }}.html">{{ tag }}</a>
                 {% endfor %}
             </span>
+            {% endif %}
+            {% if post.type == 'md' %}
+            <span class="words">
+                {% if post.word_count > 1000 %}
+
+                📑Word: 
+                {{ post.word_count//100/10 }}k
+                {% else %}
+                📑Word: 
+                {{ post.word_count }}
+                {% endif %}
+
+            </span>
+            {% endif %}
             </center>
         </div>
+
+
+
         {% if post.type == 'md' %}
         <div class="markdown-body">
             {{ post.content|safe }}
@@ -45,10 +79,11 @@
         </div>
         
         <!-- 评论区域 -->
-        <div id="comments" class="comments-area">
+        <div id="comments" class="comments-area giscus">
             <h3>评论</h3>
             <!-- 这里可以添加评论系统 -->
         </div>
+
     </div>
 </article>
 
