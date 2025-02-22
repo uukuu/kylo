@@ -16,7 +16,7 @@ CONFIG = {
     'keywords': ['算法竞赛', '数学', 'AI', '学习笔记', 'Latex'],
     'description': 'Personal Blog System',
     'local_url': 'http://127.0.0.1:8080',
-    'public_url': 'https://uukuu.github.io',
+    'public_url': 'https://blog.nan2inf.com',
     'theme': 'default',
     'output_dir': '',
     'source_dir': './content',
@@ -100,15 +100,16 @@ class Post:
             self.metadata = {}
             self.content = content.strip()
 
-        # 确保内容不为空
-        if not self.content:
-            self.content = "# " + self.title  # 如果内容为空，使用标题作为默认内容
 
         # 处理元数据
         self.title = self.metadata.get('title', os.path.splitext(os.path.basename(self.filepath))[0])
         self.date = self._parse_date(self.metadata.get('date'))
         self.categories = self.metadata.get('categories', [])
         self.tags = self.metadata.get('tags', [])
+        
+        # 确保内容不为空
+        if not self.content:
+            self.content = "# " + self.title  # 如果内容为空，使用标题作为默认内容
 
         # 转换Markdown
         self.content = self._convert_markdown(self.content)

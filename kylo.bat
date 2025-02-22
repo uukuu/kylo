@@ -16,6 +16,7 @@ set DEPLOY=0
 set SERVER=0
 set GENERATE=0
 set UPDATEPOST=0
+set MATHNOTE=0
 
 :: 解析命令行参数
 :PARSE_ARGS
@@ -24,6 +25,7 @@ if /i "%~1"=="-d" set DEPLOY=1
 if /i "%~1"=="-s" set SERVER=1
 if /i "%~1"=="-g" set GENERATE=1
 if /i "%~1"=="-u" set UPDATEPOST=1
+if /i "%~1"=="-m" set MATHNOTE=1
 if /i "%~1"=="-all" (
     set DEPLOY=1
     set GENERATE=1
@@ -35,19 +37,24 @@ goto PARSE_ARGS
 :END_ARGS
 
 :: 参数有效性检查
-if %DEPLOY% equ 0 if %SERVER% equ 0 if %GENERATE% equ 0 if %UPDATEPOST% equ 0 (
+if %DEPLOY% equ 0 if %SERVER% equ 0 if %GENERATE% equ 0 if %UPDATEPOST% equ 0 if %MATHNOTE% equ 0 (
     echo please specify the operation parameter:
     echo   -g generate blog content
     echo   -d deploy to GitHub
     echo   -s start local server
     echo   -u copy posts from other Folders
+    echo   -m generate mathnotes by latex2md
     pause
     exit /b 1
 )
 :: 拷贝博客内容
 if %UPDATEPOST% equ 1 (
     echo copying posts from other Folders...
-    %FileSync% "%BLOG_DIR%fileSync/XCPC.ffs_batch"
+    @REM %FileSync% "%BLOG_DIR%fileSync/XCPC.ffs_batch"
+    for %%i in ("%BLOG_DIR%fileSync\*.ffs_batch") do (
+        echo Running %%i
+        %FileSync% "%%i"
+    )
     if errorlevel 1 (
         echo posts copy failed!
         pause
@@ -56,6 +63,12 @@ if %UPDATEPOST% equ 1 (
     echo posts copied successfully!
 )
 
+:: 利用 latex2md 生成数学笔记
+if %MATHNOTE% equ 1 (
+    echo generating mathnotes...
+    %PYTHON% "E:\github\latex2md\work.py"
+    echo mathnotes generated successfully!
+)
 
 :: 生成博客内容
 if %GENERATE% equ 1 (
